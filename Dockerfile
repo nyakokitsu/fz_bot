@@ -4,7 +4,7 @@
 ####################################
 # Builder stage (musl target)
 ####################################
-FROM rust:1.95.0-alpine3.21 as builder
+FROM rust:1.95.0-bullseye as builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     musl-tools \
