@@ -4,6 +4,11 @@ $simple    but    good^{tm}$ factorio.zone telegram bot
 good for managing server state and stuff
 
 ## How to run?
+Docker
+```bash
+docker run -e TELEGRAM_TOKEN="yor tg tokxen" -e FACTORIO_TOKEN="yor fz taken" ghcr.io/nyakokitsu/fz_bot:latest
+```
+or build yourself
 ```bash
 export TELEGRAM_TOKEN="yor tg tokxen"
 export FACTORIO_TOKEN="yor fz taken"
