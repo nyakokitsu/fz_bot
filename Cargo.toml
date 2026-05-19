@@ -1,0 +1,18 @@
+[package]
+name = "fz_bot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+teloxide = { version = "0.13", features = ["macros", "ctrlc_handler"] }
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+reqwest = { version = "0.11", features = ["json", "multipart", "stream"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.10"
+futures-util = "0.3"
+log = "0.4"
+env_logger = "0.11"
+bytes = "1.5"
+native-tls = "0.2.18"
