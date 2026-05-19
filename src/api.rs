@@ -4,9 +4,8 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio_tungstenite::{connect_async_tls_with_config, tungstenite::protocol::Message};
+use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
 use tokio::sync::RwLock;
-use native_tls::TlsConnector;
 
 const FACTORIO_ZONE_ENDPOINT: &str = "factorio.zone";
 
@@ -97,18 +96,8 @@ impl FZClient {
 
     async fn connect_internal(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("wss://{}/ws", FACTORIO_ZONE_ENDPOINT);
-        
-        let connector = TlsConnector::builder()
-            .danger_accept_invalid_certs(true)
-            .build()?;
-        let tokio_connector = tokio_tungstenite::Connector::NativeTls(connector);
 
-        let (mut ws_stream, _) = connect_async_tls_with_config(
-            url, 
-            None,
-            false,
-            Some(tokio_connector)
-        ).await?;
+        let (mut ws_stream, _) = connect_async(url).await?;
         println!("Connected to Factorio Zone WS");
 
         while let Some(msg) = ws_stream.next().await {
