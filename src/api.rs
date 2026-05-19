@@ -4,14 +4,9 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio_tungstenite::{tungstenite::protocol::Message, client_async};
-use tokio_rustls::TlsConnector as TokioTlsConnector;
-use rustls::{ClientConfig, client::ServerCertVerifier, client::ServerCertVerified, Error as RustlsError};
-use std::time::SystemTime;
-use tokio_tungstenite::tungstenite::http::Request as WsRequest;
-use tokio::net::TcpStream;
-use std::convert::TryFrom;
+use tokio_tungstenite::{connect_async_tls_with_config, tungstenite::protocol::Message};
 use tokio::sync::RwLock;
+use native_tls::TlsConnector;
 
 const FACTORIO_ZONE_ENDPOINT: &str = "factorio.zone";
 
@@ -102,43 +97,18 @@ impl FZClient {
 
     async fn connect_internal(&self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         let url = format!("wss://{}/ws", FACTORIO_ZONE_ENDPOINT);
+        
+        let connector = TlsConnector::builder()
+            .danger_accept_invalid_certs(true)
+            .build()?;
+        let tokio_connector = tokio_tungstenite::Connector::NativeTls(connector);
 
-        // Create a TLS config that skips certificate verification.
-        // This is insecure and should only be used for testing or when
-        // you control the connection target. Prefer adding the proper
-        // CA to the root store in production.
-        struct NoVerifier;
-        impl ServerCertVerifier for NoVerifier {
-            fn verify_server_cert(
-                &self,
-                _end_entity: &rustls::Certificate,
-                _intermediates: &[rustls::Certificate],
-                _server_name: &rustls::client::ServerName,
-                _scts: &mut dyn Iterator<Item = &[u8]>,
-                _ocsp_response: &[u8],
-                _now: SystemTime,
-            ) -> Result<ServerCertVerified, RustlsError> {
-                Ok(ServerCertVerified::assertion())
-            }
-        }
-
-        let mut cfg = ClientConfig::builder()
-            .with_safe_defaults()
-            .with_custom_certificate_verifier(Arc::new(NoVerifier))
-            .with_no_client_auth();
-
-        let tls_connector = TokioTlsConnector::from(Arc::new(cfg));
-
-        // Connect TCP then perform TLS handshake manually and upgrade to WS
-        let addr = format!("{}:443", FACTORIO_ZONE_ENDPOINT);
-        let tcp = TcpStream::connect(addr).await?;
-        let server_name = rustls::ServerName::try_from(FACTORIO_ZONE_ENDPOINT)
-            .map_err(|_| "invalid dns name")?;
-
-        let tls_stream = tls_connector.connect(server_name, tcp).await?;
-
-        let req = WsRequest::builder().uri(&url).header("Host", FACTORIO_ZONE_ENDPOINT).body(())?;
-        let (mut ws_stream, _resp) = client_async(req, tls_stream).await?;
+        let (mut ws_stream, _) = connect_async_tls_with_config(
+            url, 
+            None,
+            false,
+            Some(tokio_connector)
+        ).await?;
         println!("Connected to Factorio Zone WS");
 
         while let Some(msg) = ws_stream.next().await {
