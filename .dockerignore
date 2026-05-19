@@ -1,0 +1,27 @@
+# Ignore Rust build artifacts
+target/
+**/target/
+
+# Ignore local env files and secrets
+.env
+
+# Ignore VCS
+.git
+.gitignore
+
+# Ignore Docker artifacts
+Dockerfile
+.dockerignore
+
+# Ignore editor directories
+.vscode
+.idea
+
+# macOS
+.DS_Store
+
+# Node
+node_modules
+
+# Logs
+*.log
