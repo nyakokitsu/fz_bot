@@ -4,7 +4,11 @@
 ####################################
 # Builder stage (musl target)
 ####################################
-FROM clux/muslrust:stable as builder
+FROM rust:1.95.0-alpine3.21 as builder
+
+RUN apk add --no-cache openssl-dev openssl-libs-static musl-dev curl libgcc gcc g++ build-base tar
+
+RUN rustup target add x86_64-unknown-linux-musl
 
 WORKDIR /usr/src/fz_bot
 
