@@ -17,5 +17,5 @@ env_logger = "0.11"
 bytes = "1.5"
 openssl = { version = "0.10", features = ["vendored"] }
 tokio-rustls = "0.23"
-rustls = "0.20"
+rustls = { version = "0.20", features = ["dangerous_configuration"] }
 http = "0.2"

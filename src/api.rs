@@ -8,7 +8,7 @@ use tokio_tungstenite::{tungstenite::protocol::Message, client_async};
 use tokio_rustls::TlsConnector as TokioTlsConnector;
 use rustls::{ClientConfig, client::ServerCertVerifier, client::ServerCertVerified, Error as RustlsError};
 use std::time::SystemTime;
-use http::Request;
+use tokio_tungstenite::tungstenite::http::Request as WsRequest;
 use tokio::net::TcpStream;
 use std::convert::TryFrom;
 use tokio::sync::RwLock;
@@ -137,7 +137,7 @@ impl FZClient {
 
         let tls_stream = tls_connector.connect(server_name, tcp).await?;
 
-        let req = Request::builder().uri(&url).header("Host", FACTORIO_ZONE_ENDPOINT).body(())?;
+        let req = WsRequest::builder().uri(&url).header("Host", FACTORIO_ZONE_ENDPOINT).body(())?;
         let (mut ws_stream, _resp) = client_async(req, tls_stream).await?;
         println!("Connected to Factorio Zone WS");
 
