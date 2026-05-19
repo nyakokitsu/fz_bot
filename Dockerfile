@@ -4,14 +4,10 @@
 ####################################
 # Builder stage (musl target)
 ####################################
-FROM rust:1.95.0-bullseye as builder
+FROM ekidd/rust-musl-builder:latest as builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    musl-tools \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
-
-RUN rustup target add x86_64-unknown-linux-musl
+# Build OpenSSL statically when required by crates like `openssl-sys`
+ENV OPENSSL_STATIC=1
 
 WORKDIR /usr/src/fz_bot
 
