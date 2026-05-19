@@ -15,7 +15,9 @@ WORKDIR /usr/src/fz_bot
 COPY . .
 
 # Build release binary for musl
-RUN cargo build --release --target x86_64-unknown-linux-musl
+# Remove `Cargo.lock` if it uses a newer lockfile format than the builder's Cargo,
+# allowing the builder to regenerate a compatible lockfile.
+RUN rm -f Cargo.lock && cargo build --release --target x86_64-unknown-linux-musl
 
 ####################################
 # Runtime stage (Alpine)
