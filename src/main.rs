@@ -192,7 +192,7 @@ async fn callback_handler(bot: Bot, q: CallbackQuery, client: FZClient) -> Respo
 
             if need_run {
                 let mapped_slot = if slot == "2" { "slot2" } else { "slot1" };
-                let _ = client.start_instance("eu-north-1", "2.0.55", mapped_slot).await;
+                let _ = client.start_instance("eu-north-1", "2.0.76", mapped_slot).await;
                 
                 let running_status_msg = bot.send_message(message.chat().id, "Сервер запускается...").await?;
                 
